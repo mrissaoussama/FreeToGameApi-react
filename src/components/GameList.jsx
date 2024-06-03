@@ -1,13 +1,13 @@
-import PropTypes from 'prop-types';
+/* eslint-disable react/prop-types */
 import GameCard from './GameCard';
 
-const GameList = ({ games, onGameClick }) => {console.log(onGameClick);
+const GameList = ({ games, onGameClick, favorites, onFavorite }) => {console.log(onGameClick);
   return (
     <div className="game-list">
       {games.length > 0 ? (
-        games.map((game) => (
-          <GameCard key={game.id} game={game} onGameClick={onGameClick} />
-        ))
+       games.map((game) => (
+        <GameCard key={game.id} game={game} onGameClick={onGameClick} favorites={favorites} onFavorite={onFavorite} />
+      ))
       ) : (
         <p></p>
       )}
@@ -15,9 +15,5 @@ const GameList = ({ games, onGameClick }) => {console.log(onGameClick);
   );
 };
 
-GameList.propTypes = {
-  games: PropTypes.array.isRequired,
-  onGameClick: PropTypes.func.isRequired,
-};
 
 export default GameList;

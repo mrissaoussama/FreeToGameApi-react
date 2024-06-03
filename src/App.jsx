@@ -4,6 +4,7 @@ import GameList from './components/GameList';
 import GameDetail from './components/GameDetail';
 import Filter from './components/Filter';
 import Search from './components/Search';
+import Favorites from './components/Favorites';
 import './App.css';
 import ReactModal from 'react-modal';
 
@@ -15,6 +16,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showFavorites, setShowFavorites] = useState(false);
 
   const BASE_URL = 'https://free-to-play-games-database.p.rapidapi.com/api/';
   const API_KEY = '4b7cbd7dd1msh91d269a764b35ecp101f7ajsn5a7381ba0f49';
@@ -30,7 +32,19 @@ function App() {
     const data = await response.json();
     setSelectedGame(data);
   };
+  const [favorites, setFavorites] = useState(JSON.parse(localStorage.getItem('favorites')) || []);
 
+  const handleFavorite = (game) => {
+    let newFavorites;
+    if (favorites.find(favorite => favorite.id === game.id)) {
+      newFavorites = favorites.filter(favorite => favorite.id !== game.id);
+    } else {
+      newFavorites = [...favorites, game];
+    }
+    setFavorites(newFavorites);
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+  };
+  
   const handleGameClick = (game) => {
     console.log("game")
     fetchGameDetails(game.id);
@@ -90,16 +104,19 @@ function App() {
   const filteredGames = games.filter((game) => game.title.toLowerCase().includes(searchTerm.toLowerCase()));
   return (
     <div className="App">
-      <Header />
-      <Filter onFilterChange={handleFilterChange} />
-      <Search onSearch={handleSearch} />
-      {loading && <p className="center-text">Loading...</p>}
+    <Header showFavorites={showFavorites} setShowFavorites={setShowFavorites} />
+    {!showFavorites && <Filter onFilterChange={handleFilterChange} />}
+    {!showFavorites && <Search onSearch={handleSearch} />}
+{loading && <p className="center-text">Loading...</p>}
 {error && <p className="center-text">{error}</p>}
-{filteredGames.length > 0 && <p className="center-text">Found {filteredGames.length} results</p>}
-{!loading && filteredGames.length === 0  && <p className='center-text'>No results found</p>}
+{!showFavorites && filteredGames.length > 0 && <p className="center-text">Found {filteredGames.length} results</p>}
+{!loading && !showFavorites && filteredGames.length === 0  && <p className='center-text'>No results found</p>}
 
-      {<GameList games={filteredGames} onGameClick={handleGameClick} />}
-      <ReactModal 
+{showFavorites ? (
+  <Favorites favorites={favorites} onGameClick={handleGameClick} onFavorite={handleFavorite} />
+) : (
+  <GameList games={filteredGames} onGameClick={handleGameClick} favorites={favorites} onFavorite={handleFavorite} />
+)}  <ReactModal 
         isOpen={isModalOpen} 
         onRequestClose={closeModal}
         style={{
@@ -113,7 +130,7 @@ function App() {
           }
         }}
       >
-        {selectedGame && <GameDetail game={selectedGame} />}
+        {selectedGame && <GameDetail game={selectedGame} favorites={favorites} onFavorite={handleFavorite} />}
       </ReactModal>
     </div>
   );

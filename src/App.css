@@ -47,7 +47,12 @@ header {
   margin: 1em;
   text-align: center;
 }
+.favorites-container {
+  display: flex; 
 
+  flex-direction: row;
+  align-items: center;
+}
 .filter select, .search input {
   padding: 0.5em;
   margin-right: 0.5em;

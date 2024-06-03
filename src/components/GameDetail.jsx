@@ -1,9 +1,12 @@
 /* eslint-disable react/prop-types */
+import { FaStar } from 'react-icons/fa'; 
 
-const GameDetail = ({ game }) => {
+const GameDetail = ({ game, favorites, onFavorite }) => {
     return (
       <div className="game-detail">
         <h2>{game.title}</h2>
+        <FaStar onClick={(e) => {e.stopPropagation(); onFavorite(game)}} color={favorites.find(favorite => favorite.id === game.id) ? 'gold' : 'grey'} />
+
         <img src={game.thumbnail} alt={game.title} />
         <p>Genre: {game.genre}</p>
         <p>Platform: {game.platform}</p>
